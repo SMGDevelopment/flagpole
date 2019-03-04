@@ -333,5 +333,8 @@ function flagpole_operation_redirect( $error_code = false, $redirect = true ) {
 		return $redirect_url;
 	}
 }
+function flagpole_ns() {
+	return Flagpole::init();
+}
 
 add_shortcode( 'debugFlagpole', 'flagpole_shortcode_debug' );
