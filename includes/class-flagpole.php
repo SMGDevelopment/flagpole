@@ -224,7 +224,8 @@ class Flagpole {
 			} elseif ( $flag->get_enforced() ) {
 				return ( $reason ? 'Enforced' : true );
 			} else {
-				if ( self::check_query_string( $flag_key ) ) {
+
+				if ( false !== self::check_query_string( $flag_key ) ) {
 					return ( $reason ? 'Using a group query string' : true );
 				} elseif ( flagpole_user_enabled( $flag_key ) ) {
 					return ( $reason ? 'User previewing flag' : true );
@@ -456,8 +457,10 @@ class Flagpole {
 		$query = flagpole_find_query_string();
 
 		if ( ! empty( $query ) && $query ) {
+			if( $query === $flag_key ) {
+				return true;
+			}
 			$group = $this->get_group( $query );
-
 			if ( false !== $group ) {
 				return $group->has_flag( $flag_key );
 			} else {
