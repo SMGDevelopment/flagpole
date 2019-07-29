@@ -291,17 +291,23 @@ function flagpole_redirect_with_key() {
  *
  * @return bool|string False if there isn't one, the flag string if found.
  */
-function flagpole_find_query_string() {
+function flagpole_find_query_string($query_string_key= false) {
 
-	/* TODO: #21 - Make this a configurable key */
-	$query_string_key = 'flag';
+	if (false === $query_string_key) {
+		/* Backwards compatability */
+		$query_string_key = 'flag';
 
-	// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification, Wordpress.VIP.SuperGlobalInputUsage.AccessDetected
-	if ( isset( $_GET[ $query_string_key ] ) && '' !== $_GET[ $query_string_key ] ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification, Wordpress.VIP.SuperGlobalInputUsage.AccessDetected
-		return sanitize_title( wp_unslash( $_GET[ $query_string_key ] ) );
+		if ( isset( $_GET[ $query_string_key ] ) && '' !== $_GET[ $query_string_key ] ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification, Wordpress.VIP.SuperGlobalInputUsage.AccessDetected
+			return sanitize_title( wp_unslash( $_GET[ $query_string_key ] ) );
+		} else {
+			return false;
+		}
 	} else {
-		return false;
+		if ( isset( $_GET[ "no$query_string_key" ] ) ) return "no$query_string_key";  # support override disable
+		if ( isset( $_GET[ $query_string_key ] ) ) return $query_string_key;  # support enable
+		if ( isset( $_GET[ 'flag' ] )) return sanitize_title( wp_unslash( $_GET[ $query_string_key ] ) ); # backwards compatability
 	}
 }
 

@@ -217,6 +217,8 @@ class Flagpole {
 	 */
 	public function is_enabled( $flag_key, $reason = false ) {
 		$flag = $this->find_flag( $flag_key );
+		$check_query_string=  self::check_query_string($flag_key);
+		if (null === $check_query_string) return ( $reason ? '' : null );  # user override disable
 
 		if ( $flag ) {
 			if ( $flag->is_published() ) {
@@ -225,7 +227,7 @@ class Flagpole {
 				return ( $reason ? 'Enforced' : true );
 			} else {
 
-				if ( false !== self::check_query_string( $flag_key ) ) {
+				if ( false !== $check_query_string ) {
 					return ( $reason ? 'Using a group query string' : true );
 				} elseif ( flagpole_user_enabled( $flag_key ) ) {
 					return ( $reason ? 'User previewing flag' : true );
@@ -455,7 +457,8 @@ class Flagpole {
 	 * @return bool Is there a query string for this flag currently?
 	 */
 	public function check_query_string( $flag_key ) {
-		$query = flagpole_find_query_string();
+		$query = flagpole_find_query_string( $flag_key );
+		if ("no$flag_key" === $query) return null;
 
 		if ( ! empty( $query ) && $query ) {
 			if( $query === $flag_key ) {
